@@ -1,0 +1,1 @@
+@D:/Servers/PHP/php-8.2.6-Win32-vs16-x64/php.exe "D:/Servers/PHP/php-8.2.6-Win32-vs16-x64/composer.phar" %*
