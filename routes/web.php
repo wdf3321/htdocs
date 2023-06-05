@@ -1,6 +1,13 @@
 <?php
 
+
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\App;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Http\Controllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +20,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::group(
+    [
+        'prefix' => LaravelLocalization::setlocale(),   
+        'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
+    ],
+    function () {
+        Route::get('/', function () {
+            return view('welcome');
+        });
 
-Auth::routes();
+        Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('/home', [Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('dashboard', [Controllers\DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/language/change', function (Request $request) {
+            $locale = $request->input('locale');
+            if (in_array($locale, ['en', 'zh-tw'])) {
+                $request->session()->put('locale', $locale);
+                LaravelLocalization::setLocale($locale);
+            }
+            return redirect()->route('dashboard');
+        })->name('language.change');
+        
+        
+        
+    }
+);
